@@ -30,7 +30,36 @@ success "Done"
 
 step "Installing development tools..."
 brew install --cask iterm2
-brew install --cask raycast
+brew install --cask vivaldi
+
+# 1. Ensure the Homebrew tap is added (brew tap is natively idempotent)
+echo "Setting up tinycast tap..."
+brew trust --tap abue-ammar/tinycast
+brew tap abue-ammar/tinycast
+
+# 2. Check macOS major version (Sequoia is major version 15)
+os_major=$(sw_vers -productVersion | cut -d. -f1)
+
+if [[ "$os_major" -eq 15 ]]; then
+    echo "macOS Sequoia (v15.x) detected."
+    
+    if brew list --cask tinycast-sequoia &>/dev/null; then
+        echo "-> tinycast-sequoia is already installed. Skipping."
+    else
+        echo "-> Installing tinycast-sequoia..."
+        brew install --cask tinycast-sequoia
+    fi
+else
+    echo "Non-Sequoia macOS version detected (Major version: $os_major)."
+    
+    if brew list --cask tinycast &>/dev/null; then
+        echo "-> tinycast is already installed. Skipping."
+    else
+        echo "-> Installing tinycast..."
+        brew install --cask "$TAP_NAME/tinycast"
+    fi
+fi
+
 brew install zsh
 brew install git
 brew install bat
